@@ -1,8 +1,11 @@
 
 export default function CommunityDashboard() {
     return(
-        <div className="shadow-nadal bg-white col-span-2 rounded-lg">
-
+        <div className="px-2 py-1 flex flex-col shadow-nadal bg-white col-span-2 rounded-lg">
+            <div className="w-full  ">Community</div>
+            <div className="   flex justify-center items-center gap-2 w-full   flex-1">
+                <img src="Communityimage.svg" alt="" className="-mt-6" />
+            </div>
         </div>
     )
 }

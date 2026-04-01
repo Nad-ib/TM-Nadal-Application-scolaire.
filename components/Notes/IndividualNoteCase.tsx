@@ -11,7 +11,7 @@ export default function IndividualNoteCase({title, icon, value}: NoteCaseProps) 
 			<div className=" flex justify-between items ">
 				<div className=" flex  flex-col">
 					<div className="">{title}</div>
-					<div className="-mt-2 text-gray-400 text-[10px] font-medium">avg:</div>
+					<div className="-mt-2 second-font">avg:</div>
 				</div>
 				<img src={`/${icon}.svg`} alt="flag-germany" className="scale-65"/>
 			</div>
