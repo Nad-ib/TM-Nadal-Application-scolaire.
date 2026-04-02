@@ -24,11 +24,11 @@ export default function BilanDashboard() {
 								nombre de notes insuffisantes (max 4)
 							</div>
 						</div>
-						<div className="text-xs">16</div>
+						<div className="text-xs">3</div>
 					</div>
 					<div className="w-full flex justify-between items-center">
 						<div className="flex items-center gap-3">
-							<TrueButton></TrueButton>
+							<FalseButton></FalseButton>
 							<div className="text-xs">total du premier groupe (min 16)</div>
 						</div>
 						<div className="text-xs">15</div>
@@ -38,7 +38,7 @@ export default function BilanDashboard() {
 							<TrueButton></TrueButton>
 							<div className="text-xs">Total(min 48 points)</div>
 						</div>
-						<div className="text-xs">40</div>
+						<div className="text-xs">53</div>
 					</div>
 					<div className="w-full flex justify-between items-center"></div>
 				</div>
