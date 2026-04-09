@@ -100,7 +100,7 @@ export default function Home() {
 					</div>
 				</div>
 				<div>
-					<LinkConnexion name="Already have an acount? Sign In" />
+					<LinkConnexion href="/login" name="Already have an acount? Sign In" />
 				</div>
 			</div>
 		</div>

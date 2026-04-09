@@ -73,7 +73,7 @@ export default function Login() {
                     </div>
                 </div>
                 <div>
-                    <LinkConnexion name="Don't have an acount? Sign Up" />
+                    <LinkConnexion href="/" name="Don't have an acount? Sign Up" />
                 </div>
             </div>
         </div>
