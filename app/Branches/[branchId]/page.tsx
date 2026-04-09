@@ -1,13 +1,13 @@
 import HeadInfos from "@/components/DashboardComponents/HeaderComponents/HeadInfos"
 import Branche from "@/components/NotesComponents/Branche"
 import AddButton from "@/components/AddButton"
-
+import { useProfile } from "@/hooks/useProfile"
 export default function Branches(){
-
+    const {name} = useProfile()
     return(
         <div className="bg-white w-screen h-dvh">
             <div className="w-full h-full  p-6  flex flex-col gap-2">
-                <HeadInfos/>
+                <HeadInfos name={name}/>
                 <div className="flex flex-col gap-4 items-center justify-center">
                     <Branche title="Mathématique" icon="math" note={5.6} trend={1}/>
                     <Branche title="Français" icon="flag-france" note={3.6} trend={-1}/>

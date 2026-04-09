@@ -1,11 +1,15 @@
 import Avatar from "./Avatar"
 
-export default function HeadInfos() {
+interface UserInfos {
+    name: string;
+}
+
+export default function HeadInfos({name}: UserInfos) {
     return(
         <div className="h-12  text-black flex justify-between items-center px-4">
-            <div>Nadal</div>
+            <div>NoteQuest</div>
             <div className=" flex  justify-center items-center gap-3">
-            <div> Hi Nadal</div>
+            <div> Hi {name}</div>
             <Avatar></Avatar>
             </div>
         </div>

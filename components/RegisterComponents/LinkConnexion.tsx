@@ -1,8 +1,10 @@
+interface Direction {
+    name: string;
+}
 
-
-export default function LinkConnexion() {
+export default function LinkConnexion({name}:Direction) {
 
     return(
-        <div className="flex items-center justify-center w-full"><span>Already have an acount? Sign in</span></div>
+        <div className="flex items-center justify-center w-full"><span>{name}</span></div>
     )
 }

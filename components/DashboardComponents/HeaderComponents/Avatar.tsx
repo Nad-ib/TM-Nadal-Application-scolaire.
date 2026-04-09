@@ -1,5 +1,9 @@
 import Image from "next/image";
 
+interface image {
+    name: string
+}
+
 export default function Avatar() {
     return(
         <div className="relative w-6 h-6 overflow-hidden rounded-full border-gray-200 shadow-sm">

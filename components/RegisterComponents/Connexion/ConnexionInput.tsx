@@ -1,17 +1,26 @@
 import InputComponent from "./InputComponent"
 
-interface InputInfos {
+interface ConnexionProps {
+    label: string;
     name: string;
-    role: string
-    icon?: React.ReactNode
+    role: string;
+    icon?: any;
+    value: string;
+    onChange: (val: string) => void;
 }
 
-export default function ConnexionInput({name, role, icon}:InputInfos) {
+export default function ConnexionInput({ label, name, role, icon, value, onChange }: ConnexionProps) {
 
     return(
         <div className="w-full">
-            <div><span>Email</span></div>
-            <InputComponent role={role} name={name} icon={icon}/>
+            <div><span>{label}</span></div>
+            <InputComponent 
+                role={role} 
+                name={name} 
+                icon={icon}
+                value={value}
+                onChange={onChange}
+            />
         </div>
     )
 }

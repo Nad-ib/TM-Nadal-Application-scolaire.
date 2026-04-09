@@ -1,10 +1,14 @@
+"use client"
+
 import HeadInfos from "@/components/DashboardComponents/HeaderComponents/HeadInfos";
 import BranchCard from "@/components/NotesComponents/Branche";
 import NoteItem from "@/components/Resultat/NoteItem";
 import FilterTabs from "@/components/Resultat/FilterTabs";
 import AddButton from "@/components/AddButton";
+import { useProfile } from "@/hooks/useProfile";
 
 export default function BranchDetailPage() {
+	const {name} = useProfile()
 	const notes = [
 		{ id: 1, title: "TP n°3-Optique", note: 5.5, weight: 0.5, date: "12 Nov" },
 		{
@@ -27,9 +31,14 @@ export default function BranchDetailPage() {
 	return (
 		<div className="min-h-screen bg-white">
 			<div className="max-w-md mx-auto p-6 flex flex-col gap-6">
-				<HeadInfos />
+				<HeadInfos name={name}/>
 
-				<BranchCard title="Mathématique" icon="math" note={4.8} trend={1} />
+				<NoteItem
+					title="TP n°3-Optique"
+					note={5.5}
+					weight={0.5}
+					date="12 Nov"
+				/>
 
 				<FilterTabs />
 
