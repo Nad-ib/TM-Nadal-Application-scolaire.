@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
-import { supabase } from '@/Backend/lib/supabase';
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { supabase } from "@/Backend/lib/supabase";
 
 import HeaderComponents from "@/components/RegisterComponents/HeaderComponent";
 import ConnexionInput from "@/components/RegisterComponents/Connexion/ConnexionInput";
@@ -12,61 +12,58 @@ import BreakLine from "@/components/RegisterComponents/BreakLine";
 import LinkConnexion from "@/components/RegisterComponents/LinkConnexion";
 import ButtonLine from "@/components/RegisterComponents/OtherConnexionButton.tsx/ButtonLine";
 
-
-
 export default function Home() {
+	const router = useRouter();
 
-	const router = useRouter()
-
-	const [email, setEmail] = useState("")
-	const [password, setPassword] = useState("")
-	const [passwordVerify, setPasswordVerify] = useState("")
-	const [message, setMessage] = useState("")
+	const [email, setEmail] = useState("");
+	const [password, setPassword] = useState("");
+	const [passwordVerify, setPasswordVerify] = useState("");
+	const [message, setMessage] = useState("");
 
 	const handleSignUp = async () => {
-		if(!email || !password || !passwordVerify) {
-			setMessage("veuillez remplir tous les champs.")
+		if (!email || !password || !passwordVerify) {
+			setMessage("veuillez remplir tous les champs.");
 			return;
 		}
 
 		if (password !== passwordVerify) {
-			setMessage("les mots de passe ne correspondent pas !")
+			setMessage("les mots de passe ne correspondent pas !");
 			return;
 		}
 
 		if (password.length < 6) {
-			setMessage("Le mot de passe doit contenir au moins 6 caractères.")
+			setMessage("Le mot de passe doit contenir au moins 6 caractères.");
 			return;
 		}
 
-		const {data, error} = await supabase.auth.signUp({
+		const { data, error } = await supabase.auth.signUp({
 			email: email,
 			password: password,
-		})
+		});
 
 		if (error) {
-			setMessage("Erreur : " + error.message)
+			setMessage("Erreur : " + error.message);
 		} else {
-			setMessage("Succès ! Redirection")
+			setMessage("Succès ! Redirection");
 
 			setTimeout(() => {
-				router.push("/dashboard")
-			},2000)
+				router.push("/dashboard");
+			}, 2000);
 		}
-	}
+	};
 
 	return (
 		<div className="bg-white w-screen h-dvh   ">
 			<div className="w-full h-full  px-6 py-12   flex flex-col  justify-between">
 				<div className=" flex flex-col gap-8">
-					<HeaderComponents name="sign Up" message="Gert Started Now"/>
+					<HeaderComponents name="sign Up" message="Gert Started Now" />
 					<div className="flex flex-col gap-6">
-						<ConnexionInput 
+						<ConnexionInput
 							label="Email"
-							role="email" 
-							name="Enter Email" 
+							role="email"
+							name="Enter Email"
 							value={email}
-							onChange={setEmail} 
+							onChange={setEmail}
 						/>
 						<ConnexionInput
 							label="Password"
@@ -87,11 +84,11 @@ export default function Home() {
 					</div>
 
 					<div className="flex flex-col gap-7">
-						
-						<Sign name="Sign Up" onClick={handleSignUp}/>
-						
+						<Sign name="Sign Up" onClick={handleSignUp} />
+
 						{message && (
-							<p className={`text-center text-sm ${message.includes('Succès') ? 'text-green-500' : 'text-red-500'}`}>
+							<p
+								className={`text-center text-sm ${message.includes("Succès") ? "text-green-500" : "text-red-500"}`}>
 								{message}
 							</p>
 						)}

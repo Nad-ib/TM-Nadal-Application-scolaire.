@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 interface CircularProgressProps {
 	percentage: number;
 	level: number | string;
-	size?: number; 
+	size?: number;
 	strokeWidth?: number;
 	color?: string;
 }

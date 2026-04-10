@@ -1,11 +1,14 @@
-
 interface NoteCaseProps {
 	title: string;
 	icon: string;
 	value: number;
 }
 
-export default function IndividualNoteCase({title, icon, value}: NoteCaseProps) {
+export default function IndividualNoteCase({
+	title,
+	icon,
+	value,
+}: NoteCaseProps) {
 	return (
 		<div className="bg-white flex flex-col px-2 h-25 w-25 shadow-cards rounded-lg">
 			<div className=" flex justify-between items ">
@@ -13,7 +16,7 @@ export default function IndividualNoteCase({title, icon, value}: NoteCaseProps) 
 					<div className="">{title}</div>
 					<div className="-mt-2 second-font">avg:</div>
 				</div>
-				<img src={`/${icon}.svg`} alt="flag-germany" className="scale-65"/>
+				<img src={`/${icon}.svg`} alt="flag-germany" className="scale-65" />
 			</div>
 
 			<div className="flex flex-1 text-5xl items-center justify-center">

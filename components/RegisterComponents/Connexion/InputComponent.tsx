@@ -1,12 +1,18 @@
 interface InputInfos {
-    name: string;
-    role: string;
-    icon?: string;
-    value: string; 
-    onChange: (val: string) => void; 
+	name: string;
+	role: string;
+	icon?: string;
+	value: string;
+	onChange: (val: string) => void;
 }
 
-export default function InputComponent({ name, role, icon, value, onChange }: InputInfos) {
+export default function InputComponent({
+	name,
+	role,
+	icon,
+	value,
+	onChange,
+}: InputInfos) {
 	return (
 		<div className="w-full relative flex items-center ">
 			<input
@@ -16,9 +22,9 @@ export default function InputComponent({ name, role, icon, value, onChange }: In
 				value={value}
 				onChange={(e) => onChange(e.target.value)}
 			/>
-            <div className="absolute right-6 text-gray-400">
-                <img src={`/${icon}.svg`} alt="" className="scale-100"/>
-            </div>
+			<div className="absolute right-6 text-gray-400">
+				<img src={`/${icon}.svg`} alt="" className="scale-100" />
+			</div>
 		</div>
 	);
 }

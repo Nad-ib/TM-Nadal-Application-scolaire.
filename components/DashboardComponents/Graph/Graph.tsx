@@ -20,52 +20,46 @@ const data = [
 
 export default function MyChart() {
 	return (
-		<div className="w-full h-full">
-			<ResponsiveContainer width="100%" height="100%">
-				<LineChart
-					data={data}
-					margin={{ top: 10, right: 15, left: -40, bottom: 0 }}
-					style={{
-						pointerEvents: "none",
-						userSelect: "none",
-						outline: "none",
-					}}>
-					<CartesianGrid
-						strokeDasharray="3"
-						stroke="#aaa"
-						vertical={false}
-					/>
+		<ResponsiveContainer width="100%" height="100%">
+			<LineChart
+				data={data}
+				margin={{ top: 10, right: 15, left: -40, bottom: 0 }}
+				style={{
+					pointerEvents: "none",
+					userSelect: "none",
+					outline: "none",
+				}}>
+				<CartesianGrid strokeDasharray="3" stroke="#aaa" vertical={false} />
 
-					<XAxis
-						dataKey="name"
-						axisLine={false}
-						tickLine={false}
-						tick={{ fontSize: 10, fill: "black" }}
-					/>
-					<YAxis
-						domain={[1, 6]}
-						ticks={[1, 2, 3, 4, 5, 6]}
-						axisLine={false}
-						tickLine={false}
-						tick={{ fontSize: 10, fill: "black" }}
-						interval={0}
-					/>
+				<XAxis
+					dataKey="name"
+					axisLine={false}
+					tickLine={false}
+					tick={{ fontSize: 10, fill: "black" }}
+				/>
+				<YAxis
+					domain={[1, 6]}
+					ticks={[1, 2, 3, 4, 5, 6]}
+					axisLine={false}
+					tickLine={false}
+					tick={{ fontSize: 10, fill: "black" }}
+					interval={0}
+				/>
 
-					<Line
-						type="monotone"
-						dataKey="avg"
-						stroke="#6366f1"
-						strokeWidth={3}
-						activeDot={false}
-						dot={{
-							r: 4,
-							fill: "#6366f1",
-							strokeWidth: 2,
-							stroke: "white",
-						}}
-					/>
-				</LineChart>
-			</ResponsiveContainer>
-		</div>
+				<Line
+					type="monotone"
+					dataKey="avg"
+					stroke="#6366f1"
+					strokeWidth={3}
+					activeDot={false}
+					dot={{
+						r: 4,
+						fill: "#6366f1",
+						strokeWidth: 2,
+						stroke: "white",
+					}}
+				/>
+			</LineChart>
+		</ResponsiveContainer>
 	);
 }
