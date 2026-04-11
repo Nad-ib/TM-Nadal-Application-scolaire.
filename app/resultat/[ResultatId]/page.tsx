@@ -8,6 +8,7 @@ import NoteItem from "@/components/Resultat/NoteItem";
 import FilterTabs from "@/components/Resultat/FilterTabs";
 import AddButton from "@/components/AddButton";
 import { useProfile } from "@/hooks/useProfile";
+import SwipeToDelete from "@/components/SwipeToDelete";
 import { 
     getBranchAverage, 
     getSeriesAverage, 
@@ -33,7 +34,6 @@ export default function BranchDetailPage({ params }: { params: Promise<{ Resulta
             .maybeSingle();
 
         if (branch) {
-            
             const [avg, trend] = await Promise.all([
                 getBranchAverage(branch.id),
                 getBranchTrend(branch.id)
@@ -61,6 +61,14 @@ export default function BranchDetailPage({ params }: { params: Promise<{ Resulta
         setLoading(false);
     };
 
+    const handleDeleteNote = async (id: string) => {
+        const { error } = await supabase.from("notes").delete().eq("id", id);
+        if (!error) {
+            setNotes(prev => prev.filter(n => n.id !== id));
+            loadData();
+        }
+    };
+
     useEffect(() => { loadData(); }, [ResultatId]);
 
     return (
@@ -82,15 +90,16 @@ export default function BranchDetailPage({ params }: { params: Promise<{ Resulta
                         <p className="text-center text-gray-400">Chargement...</p>
                     ) : notes.length > 0 ? (
                         notes.map((n) => (
-                            <NoteItem
-                                key={n.id}
-                                id={n.id}
-                                title={n.title}
-                                note={n.displayNote}
-                                weight={n.weight}
-                                date={new Date(n.created_at).toLocaleDateString()}
-                                is_group={n.is_group}
-                            />
+                            <SwipeToDelete key={n.id} onDelete={() => handleDeleteNote(n.id)}>
+                                <NoteItem
+                                    id={n.id}
+                                    title={n.title}
+                                    note={n.displayNote}
+                                    weight={n.weight}
+                                    date={new Date(n.created_at).toLocaleDateString()}
+                                    is_group={n.is_group}
+                                />
+                            </SwipeToDelete>
                         ))
                     ) : (
                         <p className="text-center text-gray-400">Aucune note trouvée.</p>
