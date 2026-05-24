@@ -23,8 +23,14 @@ export default function Dashboard() {
 					</Link>
 
 					<GraphDashboard></GraphDashboard>
-					<CommunityDashboard></CommunityDashboard>
-					<StatsDashboard></StatsDashboard>
+					<Link href="/community" className="contents">
+						<CommunityDashboard></CommunityDashboard>
+					</Link>
+					
+					<Link href="/stats" className="contents">
+						<StatsDashboard></StatsDashboard>
+					</Link>
+					
 					<BilanDashboard></BilanDashboard>
 				</div>
 			</div>
