@@ -5,7 +5,7 @@ import HeadInfos from "@/components/DashboardComponents/HeaderComponents/HeadInf
 import BranchCard from "@/components/NotesComponents/Branche";
 import NoteItem from "@/components/Resultat/NoteItem";
 import FilterTabs from "@/components/Resultat/FilterTabs";
-import AddButton from "@/components/AddButton";
+import AddNoteCard from "@/components/AddNoteCard";
 import { useProfile } from "@/hooks/useProfile";
 import SwipeToDelete from "@/components/SwipeToDelete";
 import { getBranchDetails, deleteNote } from "@/Backend/services/branches";
@@ -21,6 +21,9 @@ export default function BranchDetailPage({
 	const [notes, setNotes] = useState<any[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [branchData, setBranchData] = useState<any | null>(null);
+	const [activeTab, setActiveTab] = useState<"all" | "single" | "groups">(
+		"all",
+	);
 
 	const loadData = async () => {
 		setLoading(true);
@@ -51,6 +54,12 @@ export default function BranchDetailPage({
 		loadData();
 	}, [ResultatId]);
 
+	const filteredNotes = notes.filter((n) => {
+		if (activeTab === "single") return !n.is_group;
+		if (activeTab === "groups") return n.is_group;
+		return true;
+	});
+
 	return (
 		<div className="min-h-screen bg-white pb-28">
 			<div className="max-w-md mx-auto p-6 flex flex-col gap-6">
@@ -67,13 +76,17 @@ export default function BranchDetailPage({
 					}}
 				/>
 
-				<FilterTabs />
+				<FilterTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
 				<div className="flex flex-col gap-4">
+					{!loading && branchData && (
+						<AddNoteCard branchId={branchData.id} onNoteAdded={loadData} />
+					)}
+
 					{loading ? (
 						<p className="text-center text-gray-400">Chargement...</p>
-					) : notes.length > 0 ? (
-						notes.map((n) => (
+					) : filteredNotes.length > 0 ? (
+						filteredNotes.map((n) => (
 							<SwipeToDelete key={n.id} onDelete={() => handleDeleteNote(n.id)}>
 								<NoteItem
 									id={n.id}
@@ -86,16 +99,12 @@ export default function BranchDetailPage({
 							</SwipeToDelete>
 						))
 					) : (
-						<p className="text-center text-gray-400">Aucune note trouvée.</p>
+						<p className="text-center text-gray-400 py-4">
+							Aucun élément ne correspond à ce filtre.
+						</p>
 					)}
 				</div>
 			</div>
-
-			{branchData && (
-				<div className="fixed bottom-8 right-8 z-50">
-					<AddButton branchId={branchData.id} onNoteAdded={loadData} />
-				</div>
-			)}
 		</div>
 	);
 }

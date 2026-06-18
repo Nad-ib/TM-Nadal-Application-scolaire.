@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import HeadInfos from "@/components/DashboardComponents/HeaderComponents/HeadInfos";
 import Branche from "@/components/NotesComponents/Branche";
-import AddBranchButton from "@/components/AddBranchButton";
+import AddBranchCard from "@/components/AddBranchCard";
 import { useProfile } from "@/hooks/useProfile";
 import {
 	fetchBranchesWithData,
@@ -49,6 +49,8 @@ export default function Branches() {
 				<HeadInfos name={name} />
 
 				<div className="flex flex-col gap-4 items-center">
+					{!loading && <AddBranchCard onBranchAdded={loadData} />}
+
 					{loading ? (
 						<p className="text-gray-400">Chargement...</p>
 					) : branches.length > 0 ? (
@@ -78,10 +80,6 @@ export default function Branches() {
 						<p className="text-gray-400 text-center mt-10">Aucune branche.</p>
 					)}
 				</div>
-			</div>
-
-			<div className="fixed bottom-8 right-8 z-50">
-				<AddBranchButton onBranchAdded={loadData} />
 			</div>
 		</div>
 	);

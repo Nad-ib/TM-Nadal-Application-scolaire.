@@ -4,24 +4,24 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/Backend/lib/supabase";
 import { X } from "lucide-react";
+import { Icon } from "@iconify/react";
 
-interface AddButtonProps {
+interface AddNoteToSeriesCardProps {
 	branchId: string;
-	parent_id?: string | null;
+	seriesId: string;
 	onNoteAdded: () => void;
 }
 
-export default function AddButton({
+export default function AddNoteToSeriesCard({
 	branchId,
-	parent_id = null,
+	seriesId,
 	onNoteAdded,
-}: AddButtonProps) {
+}: AddNoteToSeriesCardProps) {
 	const [isOpen, setIsOpen] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [title, setTitle] = useState("");
 	const [value, setValue] = useState("");
 	const [weight, setWeight] = useState("1.0");
-	const [isGroup, setIsGroup] = useState(false);
 
 	const handleSubmit = async (e: React.SyntheticEvent) => {
 		e.preventDefault();
@@ -30,9 +30,7 @@ export default function AddButton({
 		const {
 			data: { user },
 		} = await supabase.auth.getUser();
-
 		if (!user) {
-			alert("Session introuvable.");
 			setLoading(false);
 			return;
 		}
@@ -40,23 +38,20 @@ export default function AddButton({
 		const { error } = await supabase.from("notes").insert([
 			{
 				title,
-				value: isGroup ? null : parseFloat(value),
+				value: parseFloat(value),
 				weight: parseFloat(weight),
 				branch_id: branchId,
-				parent_id: parent_id,
+				parent_id: seriesId,
 				user_id: user.id,
-				is_group: isGroup,
+				is_group: false,
 			},
 		]);
 
-		if (error) {
-			alert(`Erreur: ${error.message}`);
-		} else {
+		if (!error) {
 			setIsOpen(false);
 			setTitle("");
 			setValue("");
 			setWeight("1.0");
-			setIsGroup(false);
 			onNoteAdded();
 		}
 		setLoading(false);
@@ -64,24 +59,16 @@ export default function AddButton({
 
 	return (
 		<>
-			<motion.button
+			<button
 				onClick={() => setIsOpen(true)}
-				whileHover={{ scale: 1.1 }}
-				whileTap={{ scale: 0.9 }}
-				className="w-14 h-14 bg-[#1E3A8A] rounded-full flex items-center justify-center shadow-lg z-40">
-				<svg
-					width="24"
-					height="24"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="white"
-					strokeWidth="3"
-					strokeLinecap="round"
-					strokeLinejoin="round">
-					<line x1="12" y1="5" x2="12" y2="19" />
-					<line x1="5" y1="12" x2="19" y2="12" />
-				</svg>
-			</motion.button>
+				className="w-full max-w-md p-4 bg-gray-50/40 rounded-xl border border-dashed border-gray-300 shadow-sm h-auto flex flex-col justify-center items-center gap-2 hover:bg-gray-50 hover:border-gray-400 transition-all group min-h-20 relative overflow-hidden">
+				<div className="flex items-center gap-2 text-gray-400 group-hover:text-gray-600 transition-colors">
+					<Icon icon="mdi:plus" className="text-xl" />
+					<span className="font-semibold text-xs tracking-wide">
+						Ajouter une note à cette série
+					</span>
+				</div>
+			</button>
 
 			<AnimatePresence>
 				{isOpen && (
@@ -101,11 +88,11 @@ export default function AddButton({
 							className="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl relative z-10">
 							<div className="flex justify-between items-center mb-6">
 								<h2 className="text-xl font-bold text-gray-800">
-									Ajouter {isGroup ? "une série" : "une note"}
+									Ajouter une note
 								</h2>
 								<button
 									onClick={() => setIsOpen(false)}
-									className="text-gray-400">
+									className="text-gray-400 hover:text-gray-600">
 									<X size={24} />
 								</button>
 							</div>
@@ -117,15 +104,16 @@ export default function AddButton({
 									</label>
 									<input
 										required
+										autoFocus
 										type="text"
 										value={title}
 										onChange={(e) => setTitle(e.target.value)}
-										placeholder="Ex: Examen Final"
-										className="w-full p-3 bg-gray-50 rounded-xl mt-1 text-black outline-none border border-gray-100"
+										placeholder="Ex: Vocabulaire 1"
+										className="w-full p-3 bg-gray-50 rounded-xl mt-1 text-black outline-none border border-gray-100 focus:ring-2 ring-blue-500/20 transition-all"
 									/>
 								</div>
 
-								{!isGroup && (
+								<div className="grid grid-cols-2 gap-4">
 									<div>
 										<label className="text-xs font-semibold text-gray-500 uppercase">
 											Note (1-6)
@@ -139,44 +127,28 @@ export default function AddButton({
 											value={value}
 											onChange={(e) => setValue(e.target.value)}
 											placeholder="5.5"
-											className="w-full p-3 bg-gray-50 rounded-xl mt-1 text-black outline-none border border-gray-100"
+											className="w-full p-3 bg-gray-50 rounded-xl mt-1 text-black outline-none border border-gray-100 focus:ring-2 ring-blue-500/20 transition-all"
 										/>
 									</div>
-								)}
-
-								<div>
-									<label className="text-xs font-semibold text-gray-500 uppercase">
-										Poids
-									</label>
-									<input
-										required
-										type="number"
-										step="0.1"
-										value={weight}
-										onChange={(e) => setWeight(e.target.value)}
-										className="w-full p-3 bg-gray-50 rounded-xl mt-1 text-black outline-none border border-gray-100"
-									/>
-								</div>
-
-								<div className="flex items-center gap-2 py-2">
-									<input
-										type="checkbox"
-										id="isGroup"
-										checked={isGroup}
-										onChange={(e) => setIsGroup(e.target.checked)}
-										className="w-5 h-5 accent-[#1E3A8A]"
-									/>
-									<label
-										htmlFor="isGroup"
-										className="text-sm text-gray-600 font-medium">
-										Est-ce une série de notes ?
-									</label>
+									<div>
+										<label className="text-xs font-semibold text-gray-500 uppercase">
+											Poids
+										</label>
+										<input
+											required
+											type="number"
+											step="0.1"
+											value={weight}
+											onChange={(e) => setWeight(e.target.value)}
+											className="w-full p-3 bg-gray-50 rounded-xl mt-1 text-black outline-none border border-gray-100 focus:ring-2 ring-blue-500/20 transition-all"
+										/>
+									</div>
 								</div>
 
 								<button
 									disabled={loading}
 									type="submit"
-									className="bg-[#1E3A8A] text-white font-bold py-4 rounded-2xl shadow-lg mt-2 disabled:bg-gray-400 active:scale-95 transition-transform">
+									className="bg-[#1E3A8A] hover:bg-[#1e3a8a]/90 text-white font-bold py-4 rounded-2xl shadow-lg mt-2 disabled:bg-gray-400 active:scale-95 transition-all">
 									{loading ? "Enregistrement..." : "Confirmer"}
 								</button>
 							</form>
