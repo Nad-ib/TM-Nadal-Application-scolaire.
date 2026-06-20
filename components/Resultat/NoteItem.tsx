@@ -31,10 +31,6 @@ export default function NoteItem({
 					) : (
 						<>
 							<div className="w-3.5 h-3.5 bg-[#22C55E] rounded-full" />
-							<Pencil
-								size={18}
-								className="text-gray-400 hover:text-gray-900 cursor-pointer"
-							/>
 						</>
 					)}
 				</div>
