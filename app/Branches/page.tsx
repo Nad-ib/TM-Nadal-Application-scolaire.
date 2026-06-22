@@ -46,9 +46,11 @@ export default function Branches() {
 	return (
 		<div className="bg-white w-screen min-h-screen">
 			<div className="w-full p-6 flex flex-col gap-6">
-				<HeadInfos name={name} />
+				<div className="w-full max-w-md mx-auto">
+					<HeadInfos name={name} />
+				</div>
 
-				<div className="flex flex-col gap-4 items-center">
+				<div className="flex flex-col gap-4 items-center w-full max-w-md mx-auto">
 					{!loading && <AddBranchCard onBranchAdded={loadData} />}
 
 					{loading ? (

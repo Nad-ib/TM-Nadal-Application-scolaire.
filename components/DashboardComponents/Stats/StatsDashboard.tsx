@@ -1,7 +1,11 @@
 "use client";
 
 import { supabase } from "@/Backend/lib/supabase";
-import { getUserGamification, getXpPercentage, getLevelFromXp } from "@/Backend/services/gamification";
+import {
+    getUserGamification,
+    getXpPercentage,
+    getLevelFromXp,
+} from "@/Backend/services/gamification";
 import CircularProgress from "./CircularProgress";
 import { useEffect, useState } from "react";
 import { Award } from "lucide-react";
@@ -17,7 +21,10 @@ export default function StatsDashboard() {
     useEffect(() => {
         async function loadUserStats() {
             try {
-                const { data: { user }, error: authError } = await supabase.auth.getUser();
+                const {
+                    data: { user },
+                    error: authError,
+                } = await supabase.auth.getUser();
                 if (authError) throw authError;
 
                 if (user) {
@@ -37,27 +44,27 @@ export default function StatsDashboard() {
     const xpPercentage = stats ? getXpPercentage(stats.xp) : 0;
 
     return (
-        <div className="px-3 py-2 flex flex-col shadow-nadal bg-white rounded-xl border border-gray-50 h-full justify-between overflow-hidden select-none">
+        <div className="px-3 py-2.5 flex flex-col shadow-nadal bg-white w-full h-full justify-between overflow-hidden select-none rounded-xl border border-gray-50">
             <div className="w-full flex items-center gap-2 shrink-0">
                 <div className="p-1 bg-indigo-50 rounded-lg text-[#43467F] shrink-0">
-                    <Award size={16} />
+                    <Award size={14} />
                 </div>
-                <span className="text-[11px] font-bold text-gray-800 tracking-wide uppercase truncate">
+                <span className="text-[10px] font-bold text-gray-400 tracking-wider uppercase truncate">
                     Progression
                 </span>
             </div>
 
-            <div className="flex items-center justify-center flex-1 mt-1 w-full min-h-0">
+            <div className="flex items-center justify-center flex-1 mt-2 w-full min-h-0">
                 {loading ? (
                     <div className="text-gray-400 text-[10px] font-medium animate-pulse">
                         Chargement...
                     </div>
                 ) : (
-                    <div className="flex items-center justify-center scale-110">
-                        <CircularProgress 
-                            percentage={xpPercentage} 
-                            level={currentLevel} 
-                            size={58} 
+                    <div className="flex items-center justify-center scale-100">
+                        <CircularProgress
+                            percentage={xpPercentage}
+                            level={currentLevel}
+                            size={54}
                         />
                     </div>
                 )}

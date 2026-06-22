@@ -52,36 +52,63 @@ export default function AddBranchCard({
 			</button>
 			<AnimatePresence>
 				{isOpen && (
-					<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+					<div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-20 sm:items-center bg-gray-900/20 backdrop-blur-xs overflow-y-auto">
+						<div
+							className="absolute inset-0"
+							onClick={() => setIsOpen(false)}
+						/>
+
 						<motion.div
-							initial={{ scale: 0.9, opacity: 0 }}
-							animate={{ scale: 1, opacity: 1 }}
-							exit={{ scale: 0.9, opacity: 0 }}
-							className="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl">
-							<div className="flex justify-between items-center mb-6">
-								<h2 className="text-xl font-bold text-gray-800">
+							initial={{ scale: 0.96, opacity: 0, y: 10 }}
+							animate={{ scale: 1, opacity: 1, y: 0 }}
+							exit={{ scale: 0.96, opacity: 0, y: 10 }}
+							transition={{ duration: 0.25, ease: "easeInOut" }}
+							className="relative bg-white w-full max-w-sm rounded-xl p-5 shadow-xl border border-gray-100 select-none overflow-hidden">
+							<div className="flex justify-between items-center mb-4">
+								<h2 className="text-sm font-semibold text-gray-800">
 									Nouvelle branche
 								</h2>
 								<button
+									type="button"
 									onClick={() => setIsOpen(false)}
-									className="text-gray-400 hover:text-gray-600">
-									<X size={24} />
+									className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-50 active:scale-95 transition-all">
+									<X size={16} />
 								</button>
 							</div>
-
 							<form onSubmit={handleSubmit} className="flex flex-col gap-4">
-								<input
-									required
-									autoFocus
-									value={name}
-									onChange={(e) => setName(e.target.value)}
-									placeholder="Ex: Physique, Anglais..."
-									className="w-full p-3 bg-gray-50 rounded-xl outline-none border border-gray-100 text-black focus:ring-2 ring-blue-500/20 transition-all"
-								/>
+								<div className="flex flex-col gap-1">
+									<label className="text-[10px] font-medium text-gray-400 uppercase tracking-wider px-0.5">
+										Nom de la matière
+									</label>
+									<div className="relative flex items-center">
+										<input
+											required
+											autoFocus
+											type="text"
+											value={name}
+											onChange={(e) => setName(e.target.value)}
+											placeholder="Ex: Physique, Anglais..."
+											className="w-full pl-3 pr-9 py-2 bg-gray-50 border border-gray-200/80 rounded-lg outline-none text-sm text-gray-800 placeholder-gray-400 focus:border-gray-300 focus:bg-white transition-all"
+										/>
+										{name.length > 0 && (
+											<button
+												type="button"
+												onClick={() => setName("")}
+												className="absolute right-2.5 text-gray-300 hover:text-gray-400 p-0.5 rounded-full transition-colors">
+												<X size={12} />
+											</button>
+										)}
+									</div>
+								</div>
+
 								<button
 									disabled={loading}
-									className="bg-[#1E3A8A] hover:bg-[#1e3a8a]/90 text-white font-bold py-4 rounded-2xl transition-colors disabled:opacity-50">
-									{loading ? "Création..." : "Ajouter"}
+									className="w-full bg-[#43467F] hover:bg-[#373966] text-white font-medium text-xs py-2.5 rounded-lg active:scale-[0.99] transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-2">
+									{loading ? (
+										<div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+									) : (
+										"Ajouter"
+									)}
 								</button>
 							</form>
 						</motion.div>

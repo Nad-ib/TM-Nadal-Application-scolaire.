@@ -77,34 +77,33 @@ export default function AddNoteCard({
 			</button>
 			<AnimatePresence>
 				{isOpen && (
-					<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-						<motion.div
-							initial={{ opacity: 0 }}
-							animate={{ opacity: 1 }}
-							exit={{ opacity: 0 }}
+					<div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-20 sm:items-center bg-gray-900/20 backdrop-blur-xs overflow-y-auto">
+						<div
+							className="absolute inset-0"
 							onClick={() => setIsOpen(false)}
-							className="absolute inset-0 bg-black/40 backdrop-blur-sm"
 						/>
 
 						<motion.div
-							initial={{ scale: 0.9, opacity: 0 }}
-							animate={{ scale: 1, opacity: 1 }}
-							exit={{ scale: 0.9, opacity: 0 }}
-							className="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl relative z-10">
-							<div className="flex justify-between items-center mb-6">
-								<h2 className="text-xl font-bold text-gray-800">
+							initial={{ scale: 0.96, opacity: 0, y: 10 }}
+							animate={{ scale: 1, opacity: 1, y: 0 }}
+							exit={{ scale: 0.96, opacity: 0, y: 10 }}
+							transition={{ duration: 0.25, ease: "easeInOut" }}
+							className="relative bg-white w-full max-w-sm rounded-xl p-5 shadow-xl border border-gray-100 select-none overflow-hidden">
+							<div className="flex justify-between items-center mb-4">
+								<h2 className="text-sm font-semibold text-gray-800">
 									Ajouter {isGroup ? "une série" : "une note"}
 								</h2>
 								<button
+									type="button"
 									onClick={() => setIsOpen(false)}
-									className="text-gray-400 hover:text-gray-600">
-									<X size={24} />
+									className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-50 active:scale-95 transition-all">
+									<X size={16} />
 								</button>
 							</div>
 
-							<form onSubmit={handleSubmit} className="flex flex-col gap-4">
-								<div>
-									<label className="text-xs font-semibold text-gray-500 uppercase">
+							<form onSubmit={handleSubmit} className="flex flex-col gap-3.5">
+								<div className="flex flex-col gap-1">
+									<label className="text-[10px] font-medium text-gray-400 uppercase tracking-wider px-0.5">
 										Titre
 									</label>
 									<input
@@ -114,31 +113,31 @@ export default function AddNoteCard({
 										value={title}
 										onChange={(e) => setTitle(e.target.value)}
 										placeholder="Ex: Examen Final"
-										className="w-full p-3 bg-gray-50 rounded-xl mt-1 text-black outline-none border border-gray-100 focus:ring-2 ring-blue-500/20 transition-all"
+										className="w-full px-3 py-2 bg-gray-50 border border-gray-200/80 rounded-lg outline-none text-sm text-gray-800 placeholder-gray-400 focus:border-gray-300 focus:bg-white transition-all"
 									/>
 								</div>
 
 								{!isGroup && (
-									<div>
-										<label className="text-xs font-semibold text-gray-500 uppercase">
+									<div className="flex flex-col gap-1">
+										<label className="text-[10px] font-medium text-gray-400 uppercase tracking-wider px-0.5">
 											Note (1-6)
 										</label>
 										<input
 											required
 											type="number"
-											step="0.01"
+											step="0.5"
 											min="1"
 											max="6"
 											value={value}
 											onChange={(e) => setValue(e.target.value)}
 											placeholder="5.5"
-											className="w-full p-3 bg-gray-50 rounded-xl mt-1 text-black outline-none border border-gray-100 focus:ring-2 ring-blue-500/20 transition-all"
+											className="w-full px-3 py-2 bg-gray-50 border border-gray-200/80 rounded-lg outline-none text-sm text-gray-800 placeholder-gray-400 focus:border-gray-300 focus:bg-white transition-all"
 										/>
 									</div>
 								)}
 
-								<div>
-									<label className="text-xs font-semibold text-gray-500 uppercase">
+								<div className="flex flex-col gap-1">
+									<label className="text-[10px] font-medium text-gray-400 uppercase tracking-wider px-0.5">
 										Poids
 									</label>
 									<input
@@ -147,21 +146,21 @@ export default function AddNoteCard({
 										step="0.1"
 										value={weight}
 										onChange={(e) => setWeight(e.target.value)}
-										className="w-full p-3 bg-gray-50 rounded-xl mt-1 text-black outline-none border border-gray-100 focus:ring-2 ring-blue-500/20 transition-all"
+										className="w-full px-3 py-2 bg-gray-50 border border-gray-200/80 rounded-lg outline-none text-sm text-gray-800 focus:border-gray-300 focus:bg-white transition-all"
 									/>
 								</div>
 
-								<div className="flex items-center gap-2 py-2">
+								<div className="flex items-center gap-2.5 py-1 px-0.5">
 									<input
 										type="checkbox"
 										id="isGroup"
 										checked={isGroup}
 										onChange={(e) => setIsGroup(e.target.checked)}
-										className="w-5 h-5 accent-[#1E3A8A]"
+										className="w-4 h-4 rounded border-gray-300 text-[#1E3A8A] focus:ring-0 accent-[#1E3A8A] cursor-pointer"
 									/>
 									<label
 										htmlFor="isGroup"
-										className="text-sm text-gray-600 font-medium select-none">
+										className="text-xs text-gray-600 font-medium select-none cursor-pointer">
 										Est-ce une série de notes ?
 									</label>
 								</div>
@@ -169,8 +168,12 @@ export default function AddNoteCard({
 								<button
 									disabled={loading}
 									type="submit"
-									className="bg-[#1E3A8A] hover:bg-[#1e3a8a]/90 text-white font-bold py-4 rounded-2xl shadow-lg mt-2 disabled:bg-gray-400 active:scale-95  transition-colors">
-									{loading ? "Enregistrement..." : "Confirmer"}
+									className="w-full bg-[#1E3A8A] hover:bg-[#152a63] text-white font-medium text-xs py-2.5 rounded-lg active:scale-[0.99] transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-2 mt-1">
+									{loading ? (
+										<div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+									) : (
+										"Confirmer"
+									)}
 								</button>
 							</form>
 						</motion.div>
