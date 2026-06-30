@@ -1,9 +1,9 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/Backend/lib/supabase";
 
 export function useProfile() {
-	const [name, setName] = useState("Chargement...");
+	const [name, setName] = useState("Utilisateur");
+	const [avatarUrl, setAvatarUrl] = useState("/buisnessman.svg");
 
 	useEffect(() => {
 		async function getProfile() {
@@ -13,19 +13,18 @@ export function useProfile() {
 			if (user) {
 				const { data } = await supabase
 					.from("profiles")
-					.select("full_name")
+					.select("full_name, avatar_url")
 					.eq("id", user.id)
 					.single();
 
-				if (data?.full_name) {
-					setName(data.full_name);
-				} else {
-					setName("Utilisateur");
+				if (data) {
+					if (data.full_name) setName(data.full_name);
+					if (data.avatar_url) setAvatarUrl(data.avatar_url);
 				}
 			}
 		}
 		getProfile();
 	}, []);
 
-	return { name };
+	return { name, avatarUrl };
 }

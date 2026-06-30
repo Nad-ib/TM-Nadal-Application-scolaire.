@@ -138,3 +138,61 @@ export const getBranchDetails = async (branchName: string) => {
 		notes: notesWithAverages,
 	};
 };
+
+export const getMonthlyAverages = async (): Promise<
+	{ name: string; avg: number }[]
+> => {
+	const {
+		data: { user },
+	} = await supabase.auth.getUser();
+	if (!user) return [];
+
+	const { data: notes, error } = await supabase
+		.from("notes")
+		.select("value, created_at, is_group")
+		.eq("user_id", user.id)
+		.order("created_at", { ascending: true });
+
+	if (error || !notes || notes.length === 0) return [];
+
+	const monthsMapping = [
+		"J",
+		"F",
+		"M",
+		"A",
+		"M",
+		"J",
+		"J",
+		"A",
+		"S",
+		"O",
+		"N",
+		"D",
+	];
+	const grouped: { [key: number]: { sum: number; count: number } } = {};
+
+	for (const note of notes) {
+		if (note.is_group || note.value === null || note.value === undefined)
+			continue;
+
+		const date = new Date(note.created_at);
+		const monthIndex = date.getMonth();
+
+		if (!grouped[monthIndex]) {
+			grouped[monthIndex] = { sum: 0, count: 0 };
+		}
+		grouped[monthIndex].sum += note.value;
+		grouped[monthIndex].count += 1;
+	}
+
+	const result = Object.keys(grouped).map((key) => {
+		const monthIdx = parseInt(key);
+		return {
+			name: monthsMapping[monthIdx],
+			avg:
+				Math.round((grouped[monthIdx].sum / grouped[monthIdx].count) * 10) / 10,
+		};
+	});
+
+	return result;
+};

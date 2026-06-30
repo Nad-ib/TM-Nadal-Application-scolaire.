@@ -11,12 +11,12 @@ import Link from "next/link";
 import { useProfile } from "@/hooks/useProfile";
 
 export default function Dashboard() {
-	const { name } = useProfile();
+	const { name, avatarUrl } = useProfile();
 
 	return (
 		<div className="bg-white w-screen h-dvh overflow-hidden flex flex-col justify-start">
 			<div className="w-full max-w-md mx-auto p-4 flex flex-col gap-3.5 h-full justify-start">
-				<HeadInfos name={name} />
+				<HeadInfos name={name} avatarUrl={avatarUrl} />
 
 				<div className="grid grid-cols-3 grid-rows-[auto_1.2fr_1fr_auto] gap-3.5 flex-1 min-h-0 pb-2">
 					<Link href="/Branches" className="col-span-3 block w-full h-auto">
