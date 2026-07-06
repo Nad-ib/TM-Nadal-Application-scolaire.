@@ -3,133 +3,156 @@
 import { use, useEffect, useState } from "react";
 import { supabase } from "@/Backend/lib/supabase";
 import NoteItem from "@/components/Resultat/NoteItem";
-import HeadInfos from "@/components/DashboardComponents/HeaderComponents/HeadInfos";
-import { useProfile } from "@/hooks/useProfile";
 import AddNoteToSeriesCard from "@/components/AddNoteToSeriesCard";
 import SwipeToDelete from "@/components/SwipeToDelete";
 import { getSeriesAverage } from "@/Backend/services/branches";
+import { ChevronLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function SeriesDetailPage({
-	params,
+    params,
 }: {
-	params: Promise<{ seriesId: string }>;
+    params: Promise<{ seriesId: string }>;
 }) {
-	const { seriesId } = use(params);
-	const { name } = useProfile();
+    const { seriesId } = use(params);
+    const router = useRouter();
 
-	const [subNotes, setSubNotes] = useState<any[]>([]);
-	const [seriesData, setSeriesData] = useState<any | null>(null);
-	const [average, setAverage] = useState<number | null>(null);
-	const [loading, setLoading] = useState(true);
+    const [subNotes, setSubNotes] = useState<any[]>([]);
+    const [seriesData, setSeriesData] = useState<any | null>(null);
+    const [average, setAverage] = useState<number | null>(null);
+    const [loading, setLoading] = useState(true);
 
-	const decodedParam = decodeURIComponent(seriesId);
+    const decodedParam = decodeURIComponent(seriesId);
 
-	async function fetchSeriesData() {
-		setLoading(true);
+    const currentPeriod = new Date().toLocaleDateString("fr-FR", {
+        month: "long",
+        year: "numeric"
+    });
 
-		const { data: series } = await supabase
-			.from("notes")
-			.select("*")
-			.or(`id.eq.${decodedParam},title.ilike.${decodedParam}`)
-			.eq("is_group", true)
-			.maybeSingle();
+    async function fetchSeriesData() {
+        setLoading(true);
 
-		if (series) {
-			setSeriesData(series);
-			const avg = await getSeriesAverage(series.id);
-			setAverage(avg);
+        const { data: series } = await supabase
+            .from("notes")
+            .select("*")
+            .or(`id.eq.${decodedParam},title.ilike.${decodedParam}`)
+            .eq("is_group", true)
+            .maybeSingle();
 
-			const { data: notes } = await supabase
-				.from("notes")
-				.select("*")
-				.eq("parent_id", series.id)
-				.order("created_at", { ascending: true });
+        if (series) {
+            setSeriesData(series);
+            const avg = await getSeriesAverage(series.id);
+            setAverage(avg);
 
-			setSubNotes(notes || []);
-		}
+            const { data: notes } = await supabase
+                .from("notes")
+                .select("*")
+                .eq("parent_id", series.id)
+                .order("created_at", { ascending: true });
 
-		setLoading(false);
-	}
+            setSubNotes(notes || []);
+        }
 
-	const handleDeleteSubNote = async (id: string) => {
-		const { error } = await supabase.from("notes").delete().eq("id", id);
-		if (!error) {
-			setSubNotes((prev) => prev.filter((n) => n.id !== id));
-			fetchSeriesData();
-		}
-	};
+        setLoading(false);
+    }
 
-	useEffect(() => {
-		fetchSeriesData();
-	}, [seriesId]);
+    const handleDeleteSubNote = async (id: string) => {
+        const { error } = await supabase.from("notes").delete().eq("id", id);
+        if (!error) {
+            setSubNotes((prev) => prev.filter((n) => n.id !== id));
+            fetchSeriesData();
+        }
+    };
 
-	return (
-		<div className="min-h-screen bg-white pb-20">
-			<div className="max-w-md mx-auto p-6 flex flex-col gap-6">
-				<HeadInfos name={name} />
+    useEffect(() => {
+        fetchSeriesData();
+    }, [seriesId]);
 
-				<div className="flex flex-col gap-2">
-					<span className="text-xs font-bold text-blue-600 uppercase tracking-widest ml-1">
-						Résumé de la série
-					</span>
-					{seriesData ? (
-						<NoteItem
-							id={seriesData.id}
-							title={seriesData.title}
-							note={average}
-							weight={seriesData.weight}
-							date={new Date(seriesData.created_at).toLocaleDateString()}
-							is_group={false}
-						/>
-					) : !loading ? (
-						<div className="p-4 bg-red-50 text-red-600 rounded-2xl text-sm border border-red-100">
-							Série "{decodedParam}" introuvable.
-						</div>
-					) : (
-						<div className="h-24 w-full bg-gray-100 animate-pulse rounded-2xl" />
-					)}
-				</div>
+    return (
+        <div className="min-h-screen bg-white pb-20 select-none antialiased overflow-x-hidden">
+            <div className="max-w-md mx-auto p-6 flex flex-col gap-6">
+                
+                <div className="flex items-center justify-between w-full py-4 border-b border-slate-200/60 mb-2">
+                    <div className="flex items-center gap-3">
+                        <button 
+                            onClick={() => router.back()} 
+                            className="p-2.5 bg-white border border-slate-200/80 rounded-xl text-slate-500 shadow-xs hover:text-slate-800 active:scale-95 transition-all cursor-pointer"
+                        >
+                            <ChevronLeft size={16} strokeWidth={2.5} />
+                        </button>
+                        <div className="flex flex-col">
+                            <span className="text-[10px] font-black tracking-widest text-indigo-500 uppercase">Séries</span>
+                            <h1 className="text-base font-black text-slate-900 tracking-tight -mt-0.5">Détails Évaluation</h1>
+                        </div>
+                    </div>
+                    
+                    <div className="text-[10px] font-black text-slate-600 bg-white border border-slate-200/80 p-2.5 rounded-xl uppercase tracking-wider shadow-xs h-9 flex items-center justify-center">
+                        {currentPeriod}
+                    </div>
+                </div>
 
-				<hr className="border-gray-100" />
+                <div className="flex flex-col gap-2">
+                    <span className="text-xs font-bold text-blue-600 uppercase tracking-widest ml-1">
+                        Résumé de la série
+                    </span>
+                    {seriesData ? (
+                        <NoteItem
+                            id={seriesData.id}
+                            title={seriesData.title}
+                            note={average}
+                            weight={seriesData.weight}
+                            date={new Date(seriesData.created_at).toLocaleDateString()}
+                            is_group={false}
+                        />
+                    ) : !loading ? (
+                        <div className="p-4 bg-red-50 text-red-600 rounded-2xl text-sm border border-red-100">
+                            Série "{decodedParam}" introuvable.
+                        </div>
+                    ) : (
+                        <div className="h-24 w-full bg-gray-100 animate-pulse rounded-2xl" />
+                    )}
+                </div>
 
-				<div className="flex flex-col gap-4">
-					<div className="flex flex-col gap-1 ml-1">
-						<h2 className="text-lg font-bold text-gray-800">Évaluations</h2>
-						<p className="text-sm text-gray-500">
-							Détails des notes de ce groupe
-						</p>
-					</div>
-					{!loading && seriesData && (
-						<AddNoteToSeriesCard
-							branchId={seriesData.branch_id}
-							seriesId={seriesData.id}
-							onNoteAdded={fetchSeriesData}
-						/>
-					)}
-					{loading ? (
-						<p className="text-center text-gray-400 mt-4">Chargement...</p>
-					) : subNotes.length > 0 ? (
-						subNotes.map((n) => (
-							<SwipeToDelete
-								key={n.id}
-								onDelete={() => handleDeleteSubNote(n.id)}>
-								<NoteItem
-									id={n.id}
-									title={n.title}
-									note={n.value}
-									weight={n.weight}
-									date={new Date(n.created_at).toLocaleDateString()}
-									is_group={false}
-								/>
-							</SwipeToDelete>
-						))
-					) : (
-						<div className="text-center py-10 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-							<p className="text-gray-400">Aucune note dans cette série.</p>
-						</div>
-					)}
-				</div>
-			</div>
-		</div>
-	);
+                <hr className="border-gray-100" />
+
+                <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-1 ml-1">
+                        <h2 className="text-lg font-bold text-gray-800">Évaluations</h2>
+                        <p className="text-sm text-gray-500">
+                            Détails des notes de ce groupe
+                        </p>
+                    </div>
+                    {!loading && seriesData && (
+                        <AddNoteToSeriesCard
+                            branchId={seriesData.branch_id}
+                            seriesId={seriesData.id}
+                            onNoteAdded={fetchSeriesData}
+                        />
+                    )}
+                    {loading ? (
+                        <p className="text-center text-gray-400 mt-4">Chargement...</p>
+                    ) : subNotes.length > 0 ? (
+                        subNotes.map((n) => (
+                            <SwipeToDelete
+                                key={n.id}
+                                onDelete={() => handleDeleteSubNote(n.id)}>
+                                <NoteItem
+                                    id={n.id}
+                                    title={n.title}
+                                    note={n.value}
+                                    weight={n.weight}
+                                    date={new Date(n.created_at).toLocaleDateString()}
+                                    is_group={false}
+                                />
+                            </SwipeToDelete>
+                        ))
+                    ) : (
+                        <div className="text-center py-10 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                            <p className="text-gray-400">Aucune note dans cette série.</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
 }

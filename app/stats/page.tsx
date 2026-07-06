@@ -3,140 +3,123 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/Backend/lib/supabase";
 import {
-	getFullGamificationDashboard,
-	getLevelFromXp,
-	getXpPercentage,
+    getFullGamificationDashboard,
+    getLevelFromXp,
+    getXpPercentage,
 } from "@/Backend/services/gamification";
 import { useProfile } from "@/hooks/useProfile";
-import HeadInfos from "@/components/DashboardComponents/HeaderComponents/HeadInfos";
-import CircularProgress from "@/components/DashboardComponents/Stats/CircularProgress";
+
+import StatsHeader from "@/components/Stats/StatsHeader";
+import FocusStreak from "@/components/Stats/FocusStreak";
+import MasteryCard from "@/components/Stats/MasteryCard";
+import SpecificObjectives from "@/components/Stats/SpecificObjectives";
+import DivisionCard from "@/components/Stats/DivisionCard";
+import TrophyPavilion from "@/components/Stats/TrophyPavilion";
+import BadgeDetailModal from "@/components/Stats/BadgeDetailModal";
 
 interface Badge {
-	id: string;
-	name: string;
-	description: string;
-	icon: string;
-	xp_reward: number;
+    id: string;
+    name: string;
+    description: string;
+    icon: string;
+    xp_reward: number;
 }
 
 interface UserBadge {
-	id: string;
-	badge_id: string;
-	created_at?: string;
-	badges?: {
-		name: string;
-		description: string;
-		icon: string;
-	} | null;
+    id: string;
+    badge_id: string;
+    created_at?: string;
+    badges?: {
+        name: string;
+        description: string;
+        icon: string;
+    } | null;
 }
 
 interface GamificationData {
-	stats: { xp: number };
-	badgesObtained: UserBadge[];
-	allBadges: Badge[];
+    stats: { xp: number };
+    badgesObtained: UserBadge[];
+    allBadges: Badge[];
 }
 
 export default function Stats() {
-	const { name } = useProfile();
-	const [gamiData, setGamiData] = useState<GamificationData | null>(null);
-	const [loading, setLoading] = useState(true);
+    const { name } = useProfile();
+    const [gamiData, setGamiData] = useState<GamificationData | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [selectedBadge, setSelectedBadge] = useState<Badge | null>(null);
 
-	useEffect(() => {
-		async function loadGamification() {
-			try {
-				const {
-					data: { user },
-				} = await supabase.auth.getUser();
-				if (user) {
-					const data = await getFullGamificationDashboard(user.id);
-					setGamiData(data);
-				}
-			} catch (error) {
-				console.error("Erreur chargement gamification:", error);
-			} finally {
-				setLoading(false);
-			}
-		}
-		loadGamification();
-	}, []);
+    useEffect(() => {
+        let isMounted = true;
 
-	const currentXp = gamiData?.stats?.xp ?? 0;
-	const level = getLevelFromXp(currentXp);
-	const xpPercentage = getXpPercentage(currentXp);
+        async function loadGamification() {
+            try {
+                const {
+                    data: { user },
+                } = await supabase.auth.getUser();
+                if (user) {
+                    const data = await getFullGamificationDashboard(user.id);
+                    if (isMounted) setGamiData(data);
+                }
+            } catch (error) {
+                console.error("Erreur chargement gamification:", error);
+            } finally {
+                if (isMounted) setLoading(false);
+            }
+        }
+        loadGamification();
+        return () => { isMounted = false; };
+    }, []);
 
-	if (loading) {
-		return (
-			<div className="bg-gray-50 w-screen h-dvh flex items-center justify-center font-bold text-gray-400 animate-pulse">
-				Chargement de vos succès...
-			</div>
-		);
-	}
+    const currentXp = gamiData?.stats?.xp ?? 0;
+    const level = getLevelFromXp(currentXp);
+    const xpPercentage = getXpPercentage(currentXp);
+    
+    const totalBadges = gamiData?.allBadges.length ?? 0;
+    const unlockedCount = gamiData?.badgesObtained.length ?? 0;
+    const completionPercentage = totalBadges > 0 ? Math.round((unlockedCount / totalBadges) * 100) : 0;
 
-	return (
-		<div className="bg-gray-50 w-screen h-dvh text-gray-800">
-			<div className="w-full h-full p-6 flex flex-col gap-6">
-				<HeadInfos name={name} />
+    if (loading) {
+        return (
+            <div className="bg-slate-50 w-full min-h-screen flex flex-col items-center justify-center p-6 antialiased">
+                <div className="w-full max-w-md flex flex-col gap-4 animate-pulse">
+                    <div className="h-12 bg-slate-200/80 rounded-2xl w-3/4 mb-4" />
+                    <div className="h-16 bg-slate-200/80 rounded-2xl w-full" />
+                    <div className="h-60 bg-slate-200/80 rounded-2xl w-full" />
+                </div>
+            </div>
+        );
+    }
 
-				<div className="grid grid-cols-1 grid-rows-3 gap-4 flex-1">
-					<div className="p-6 flex flex-col items-center justify-center shadow-sm bg-white border border-gray-100 rounded-2xl row-span-2">
-						<div className="w-full text-left text-xs font-bold uppercase tracking-wider text-gray-400 mb-4">
-							Progression globale
-						</div>
+    return (
+        <div className="bg-slate-50 w-full min-h-screen text-slate-800 select-none antialiased overflow-x-hidden relative overflow-y-auto scrollbar-none">
+            <div className="w-full p-5 flex flex-col gap-4 max-w-md mx-auto relative z-10 pb-24">
+                
+                <StatsHeader name={name} level={level} />
 
-						<div className="flex-1 flex items-center justify-center scale-125">
-							<CircularProgress
-								percentage={xpPercentage}
-								level={level}
-								size={140}
-								strokeWidth={10}
-								color="#22C55E"
-							/>
-						</div>
+                <FocusStreak />
 
-						<div className="text-center mt-4">
-							<p className="text-xs font-semibold text-gray-400">
-								{currentXp % 1000} / 1000 XP
-							</p>
-							<p className="text-[10px] font-medium text-gray-400 tracking-wide uppercase mt-0.5">
-								Niveau suivant
-							</p>
-						</div>
-					</div>
+                <MasteryCard xpPercentage={xpPercentage} level={level} currentXp={currentXp} />
 
-					<div className="p-4 flex flex-col shadow-sm bg-white border border-gray-100 rounded-2xl row-span-1">
-						<div className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3 px-1">
-							Insignes ({gamiData?.badgesObtained.length ?? 0})
-						</div>
+                <SpecificObjectives />
 
-						<div className="grid grid-cols-4 gap-3 overflow-y-auto flex-1 py-1">
-							{gamiData?.allBadges.map((badge) => {
-								const isUnlocked = gamiData.badgesObtained.some(
-									(b) => b.badge_id === badge.id,
-								);
+                <DivisionCard />
 
-								return (
-									<div
-										key={badge.id}
-										className={`flex flex-col items-center justify-center p-2 rounded-xl border transition-all duration-300 ${
-											isUnlocked
-												? "bg-white border-green-100 shadow-sm opacity-100 scale-100"
-												: "bg-gray-50/50 border-gray-100 opacity-40 grayscale"
-										}`}>
-										<div
-											className={`text-2xl mb-1 p-1.5 rounded-lg ${isUnlocked ? "bg-green-50 text-green-500" : "bg-gray-100 text-gray-400"}`}>
-											{badge.icon || "🏅"}
-										</div>
+                <TrophyPavilion 
+                    allBadges={gamiData?.allBadges ?? []}
+                    badgesObtained={gamiData?.badgesObtained ?? []}
+                    completionPercentage={completionPercentage}
+                    unlockedCount={unlockedCount}
+                    totalBadges={totalBadges}
+                    onSelectBadge={setSelectedBadge}
+                />
+            </div>
 
-										<span className="text-[9px] font-bold text-gray-600 text-center truncate w-full leading-tight">
-											{badge.name}
-										</span>
-									</div>
-								);
-							})}
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	);
+            {selectedBadge && (
+                <BadgeDetailModal 
+                    selectedBadge={selectedBadge} 
+                    onClose={() => setSelectedBadge(null)} 
+                />
+            )}
+        </div>
+    );
 }

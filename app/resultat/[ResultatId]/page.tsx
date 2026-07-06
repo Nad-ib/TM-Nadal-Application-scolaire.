@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useState, use } from "react";
-import HeadInfos from "@/components/DashboardComponents/HeaderComponents/HeadInfos";
 import BranchCard from "@/components/NotesComponents/Branche";
 import NoteItem from "@/components/Resultat/NoteItem";
 import FilterTabs from "@/components/Resultat/FilterTabs";
 import AddNoteCard from "@/components/AddNoteCard";
-import { useProfile } from "@/hooks/useProfile";
 import SwipeToDelete from "@/components/SwipeToDelete";
 import { getBranchDetails, deleteNote } from "@/Backend/services/branches";
+import { ChevronLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function BranchDetailPage({
 	params,
@@ -16,7 +16,7 @@ export default function BranchDetailPage({
 	params: Promise<{ ResultatId: string }>;
 }) {
 	const { ResultatId } = use(params);
-	const { name } = useProfile();
+	const router = useRouter();
 
 	const [notes, setNotes] = useState<any[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -24,6 +24,11 @@ export default function BranchDetailPage({
 	const [activeTab, setActiveTab] = useState<"all" | "single" | "groups">(
 		"all",
 	);
+
+	const currentPeriod = new Date().toLocaleDateString("fr-FR", {
+		month: "long",
+		year: "numeric",
+	});
 
 	const loadData = async () => {
 		setLoading(true);
@@ -61,9 +66,29 @@ export default function BranchDetailPage({
 	});
 
 	return (
-		<div className="min-h-screen bg-white pb-28">
+		<div className="min-h-screen bg-white pb-28 select-none antialiased overflow-x-hidden">
 			<div className="max-w-md mx-auto p-6 flex flex-col gap-6">
-				<HeadInfos name={name} />
+				<div className="flex items-center justify-between w-full py-4 border-b border-slate-200/60 mb-2">
+					<div className="flex items-center gap-3">
+						<button
+							onClick={() => router.back()}
+							className="p-2.5 bg-white border border-slate-200/80 rounded-xl text-slate-500 shadow-xs hover:text-slate-800 active:scale-95 transition-all cursor-pointer">
+							<ChevronLeft size={16} strokeWidth={2.5} />
+						</button>
+						<div className="flex flex-col">
+							<span className="text-[10px] font-black tracking-widest text-indigo-500 uppercase">
+								Détails
+							</span>
+							<h1 className="text-base font-black text-slate-900 tracking-tight -mt-0.5">
+								Branches
+							</h1>
+						</div>
+					</div>
+
+					<div className="text-[10px] font-black text-slate-600 bg-white border border-slate-200/80 p-2.5 rounded-xl uppercase tracking-wider shadow-xs h-9 flex items-center justify-center">
+						{currentPeriod}
+					</div>
+				</div>
 
 				<BranchCard
 					id={branchData?.id || ""}
