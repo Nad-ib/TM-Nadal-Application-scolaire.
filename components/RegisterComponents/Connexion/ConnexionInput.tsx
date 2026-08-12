@@ -1,34 +1,34 @@
 import InputComponent from "./InputComponent";
 
 interface ConnexionProps {
-	label: string;
-	name: string;
-	role: string;
-	icon?: any;
-	value: string;
-	onChange: (val: string) => void;
+    label: string;
+    name: string;
+    role: string;
+    icon?: any;
+    value: string;
+    onChange: (val: string) => void;
 }
 
 export default function ConnexionInput({
-	label,
-	name,
-	role,
-	icon,
-	value,
-	onChange,
+    label,
+    name,
+    role,
+    icon,
+    value,
+    onChange,
 }: ConnexionProps) {
-	return (
-		<div className="w-full">
-			<div>
-				<span>{label}</span>
-			</div>
-			<InputComponent
-				role={role}
-				name={name}
-				icon={icon}
-				value={value}
-				onChange={onChange}
-			/>
-		</div>
-	);
+    return (
+        <div className="w-full space-y-1.5">
+            <label className="text-[10px] font-black tracking-widest text-slate-400 uppercase ml-1">
+                {label}
+            </label>
+            <InputComponent
+                role={role}
+                name={name}
+                icon={icon}
+                value={value}
+                onChange={onChange}
+            />
+        </div>
+    );
 }

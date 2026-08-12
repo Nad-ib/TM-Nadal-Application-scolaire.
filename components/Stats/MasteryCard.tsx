@@ -7,9 +7,10 @@ interface MasteryCardProps {
     xpPercentage: number;
     level: number;
     currentXp: number;
+    weeklyGrowth: number;
 }
 
-export default function MasteryCard({ xpPercentage, level, currentXp }: MasteryCardProps) {
+export function MasteryCard({ xpPercentage, level, currentXp, weeklyGrowth }: MasteryCardProps) {
     return (
         <div className="p-5 flex flex-col items-center justify-center shadow-xs bg-white border border-slate-100 rounded-2xl relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-0.75 bg-indigo-500" />
@@ -19,7 +20,7 @@ export default function MasteryCard({ xpPercentage, level, currentXp }: MasteryC
                     <Target size={12} /> Maîtrise Actuelle
                 </span>
                 <span className="text-[9px] font-black px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded-md flex items-center gap-0.5 border border-emerald-100">
-                    <ArrowUpRight size={10} /> +12% cette semaine
+                    <ArrowUpRight size={10} /> {weeklyGrowth >= 0 ? `+${weeklyGrowth}%` : `${weeklyGrowth}%`} cette semaine
                 </span>
             </div>
 
@@ -49,3 +50,5 @@ export default function MasteryCard({ xpPercentage, level, currentXp }: MasteryC
         </div>
     );
 }
+
+export default MasteryCard;

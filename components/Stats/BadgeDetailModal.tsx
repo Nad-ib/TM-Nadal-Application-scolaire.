@@ -1,14 +1,6 @@
 "use client";
 
-import { Sparkles } from "lucide-react";
-
-interface Badge {
-    id: string;
-    name: string;
-    description: string;
-    icon: string;
-    xp_reward: number;
-}
+import { Badge } from "@/Backend/services/gamification"
 
 interface BadgeDetailModalProps {
     selectedBadge: Badge;
@@ -35,7 +27,13 @@ export default function BadgeDetailModal({ selectedBadge, onClose }: BadgeDetail
                 
                 <h3 className="text-sm font-black text-slate-800 tracking-tight">{selectedBadge.name}</h3>
                 
-                <p className="text-[11px] text-slate-400 font-medium mt-1.5 max-w-60 leading-relaxed">
+                {selectedBadge.role && (
+                    <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-full mt-1">
+                        {selectedBadge.role}
+                    </span>
+                )}
+                
+                <p className="text-[11px] text-slate-500 font-medium mt-2 max-w-60 leading-relaxed">
                     {selectedBadge.description || "Insigne officiel de validation de jalon académique."}
                 </p>
                 

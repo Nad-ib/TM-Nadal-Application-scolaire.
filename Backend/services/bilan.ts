@@ -3,7 +3,8 @@ import { supabase } from "@/Backend/lib/supabase";
 export interface UserObjective {
     id: string;
     user_id: string;
-    label: string;
+    title: string;
+    label?: string;
     target_value: number;
     current_value: number;
     operator: string;
@@ -15,7 +16,9 @@ export async function getUserObjectives(userId: string): Promise<UserObjective[]
     const { data, error } = await supabase
         .from("user_objectives")
         .select("*")
-        .eq("user_id", userId);
+        .eq("user_id", userId)
+        .neq("group_type", "daily_quest"); 
+        
     if (error) throw error;
     return data || [];
 }
@@ -30,7 +33,7 @@ export async function deleteObjective(id: string): Promise<void> {
 
 export async function addObjectiveCustom(
     userId: string,
-    label: string,
+    title: string,
     targetValue: number,
     operator: string
 ): Promise<UserObjective | null> {
@@ -39,7 +42,7 @@ export async function addObjectiveCustom(
         .insert([
             {
                 user_id: userId,
-                label,
+                title: title,
                 target_value: targetValue,
                 current_value: 0,
                 operator,
@@ -53,7 +56,8 @@ export async function addObjectiveCustom(
 }
 
 export function computeLocalObjectiveValue(obj: UserObjective, branches: any[], customGroups: any[]): number {
-    const labelLower = obj.label.toLowerCase();
+    const titleText = obj.title || obj.label || "";
+    const labelLower = titleText.toLowerCase();
 
     if (labelLower.includes("insuffisante") || labelLower.includes("négatif")) {
         return branches.reduce((acc, b) => 
@@ -93,7 +97,7 @@ export function computeLocalObjectiveValue(obj: UserObjective, branches: any[], 
     }
 
     if (labelLower.includes("groupe :")) {
-        const groupName = obj.label.replace(/Groupe\s*:\s*/i, "").toLowerCase().trim();
+        const groupName = titleText.replace(/Groupe\s*:\s*/i, "").toLowerCase().trim();
         const targetGroup = customGroups.find(g => g.name.toLowerCase().trim() === groupName);
         return targetGroup?.average || 0;
     }
@@ -114,6 +118,7 @@ export async function getDashboardObjectives(userId: string): Promise<UserObject
     const { data } = await supabase
         .from("user_objectives")
         .select("*")
-        .eq("user_id", userId);
+        .eq("user_id", userId)
+        .neq("group_type", "daily_quest"); 
     return data || [];
 }

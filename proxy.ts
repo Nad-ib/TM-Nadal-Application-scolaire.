@@ -2,56 +2,61 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function proxy(request: NextRequest) {
-	let response = NextResponse.next({
-		request: {
-			headers: request.headers,
-		},
-	});
+    const url = request.nextUrl.clone();
 
-	const supabase = createServerClient(
-		process.env.NEXT_PUBLIC_SUPABASE_URL!,
-		process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-		{
-			cookies: {
-				getAll() {
-					return request.cookies.getAll();
-				},
-				setAll(cookiesToSet) {
-					cookiesToSet.forEach(({ name, value, options }) =>
-						request.cookies.set(name, value),
-					);
-					response = NextResponse.next({
-						request: {
-							headers: request.headers,
-						},
-					});
-					cookiesToSet.forEach(({ name, value, options }) =>
-						response.cookies.set(name, value, options),
-					);
-				},
-			},
-		},
-	);
+    if (url.pathname.startsWith("/api/")) {
+        return NextResponse.next();
+    }
 
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
-	const url = request.nextUrl.clone();
+    let response = NextResponse.next({
+        request: {
+            headers: request.headers,
+        },
+    });
 
-	const isPublicPage = url.pathname === "/login" || url.pathname === "/";
+    const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+            cookies: {
+                getAll() {
+                    return request.cookies.getAll();
+                },
+                setAll(cookiesToSet) {
+                    cookiesToSet.forEach(({ name, value }) =>
+                        request.cookies.set(name, value),
+                    );
+                    response = NextResponse.next({
+                        request: {
+                            headers: request.headers,
+                        },
+                    });
+                    cookiesToSet.forEach(({ name, value, options }) =>
+                        response.cookies.set(name, value, options),
+                    );
+                },
+            },
+        },
+    );
 
-	if (!user && !isPublicPage) {
-		return NextResponse.redirect(new URL("/login", request.url));
-	}
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
 
-	if (user && isPublicPage) {
-		return NextResponse.redirect(new URL("/dashboard", request.url));
-	}
+    const isPublicPage = url.pathname === "/register" || url.pathname === "/";
 
-	return response;
+    if (!user && !isPublicPage) {
+        return NextResponse.redirect(new URL("/login", request.url));
+    }
+
+    if (user && isPublicPage) {
+        return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+
+    return response;
 }
 
 export const config = {
-	matcher:
-		"/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    matcher:
+        "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
 };

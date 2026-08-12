@@ -6,6 +6,7 @@ import {
     getUserObjectives,
     deleteObjective,
     addObjectiveCustom,
+    computeLocalObjectiveValue,
     UserObjective,
 } from "@/Backend/services/bilan";
 import {
@@ -75,45 +76,6 @@ export default function BilanPage() {
         loadAllData();
     }, []);
 
-    const computeCurrentValue = (obj: UserObjective): number => {
-        const labelLower = obj.label.toLowerCase();
-
-        if (labelLower.includes("insuffisante") || labelLower.includes("négatif")) {
-            return branches.reduce((acc, b) => 
-                (b.average > 0 && b.average < 4) ? acc + (4 - b.average) : acc, 0
-            );
-        }
-
-        if (labelLower.includes("somme groupe :")) {
-            const groupName = obj.label.replace(/Somme Groupe\s*:\s*/i, "").toLowerCase().trim();
-            const targetGroup = customGroups.find(g => g.name.toLowerCase().trim() === groupName);
-            if (targetGroup) {
-                if (targetGroup.total_points !== undefined) return targetGroup.total_points;
-                return branches
-                    .filter(b => b.group_id === targetGroup.id)
-                    .reduce((acc, b) => acc + (b.average || 0), 0);
-            }
-            return 0;
-        }
-
-        if (labelLower.includes("groupe :")) {
-            const groupName = obj.label.replace(/Groupe\s*:\s*/i, "").toLowerCase().trim();
-            const targetGroup = customGroups.find(g => g.name.toLowerCase().trim() === groupName);
-            return targetGroup?.average || 0;
-        }
-
-        if (labelLower.includes("générale") || labelLower.includes("global")) {
-            const validBranches = branches.filter(b => b.average > 0);
-            if (validBranches.length === 0) return 0;
-            return validBranches.reduce((acc, curr) => acc + curr.average, 0) / validBranches.length;
-        }
-
-        const matchedBranch = branches.find(b => labelLower.includes(b.name.toLowerCase()));
-        if (matchedBranch) return matchedBranch.average || 0;
-
-        return Number(obj.current_value) || 0;
-    };
-
     const checkCondition = (operator: string, current: number, target: number): boolean => {
         if (operator === "<=") return current <= target;
         if (operator === "==") return current === target;
@@ -122,9 +84,15 @@ export default function BilanPage() {
 
     const computedObjectives = useMemo(() => {
         return objectives.map(obj => {
-            const current = computeCurrentValue(obj);
+            const current = computeLocalObjectiveValue(obj, branches, customGroups);
             const isPassed = checkCondition(obj.operator, current, Number(obj.target_value));
-            return { ...obj, computedCurrent: current, isPassed };
+            
+            return { 
+                ...obj, 
+                label: obj.title || obj.label || "",
+                computedCurrent: current, 
+                isPassed 
+            };
         });
     }, [objectives, branches, customGroups]);
 
@@ -147,19 +115,19 @@ export default function BilanPage() {
         const targetNum = parseFloat(newTarget);
         if (isNaN(targetNum)) return;
 
-        let finalLabel = "";
-        if (evaluationType === "general") finalLabel = "Moyenne Générale";
-        if (evaluationType === "negative_points") finalLabel = "Points Négatifs Globaux";
-        if (evaluationType === "specific_branch" && selectedBranch) finalLabel = `Moyenne : ${selectedBranch}`;
-        if (evaluationType === "group_average" && selectedGroup) finalLabel = `Groupe : ${selectedGroup}`;
-        if (evaluationType === "group_sum" && selectedGroup) finalLabel = `Somme Groupe : ${selectedGroup}`;
+        let finalTitle = "";
+        if (evaluationType === "general") finalTitle = "Moyenne Générale";
+        if (evaluationType === "negative_points") finalTitle = "Points Négatifs Globaux";
+        if (evaluationType === "specific_branch" && selectedBranch) finalTitle = `Moyenne : ${selectedBranch}`;
+        if (evaluationType === "group_average" && selectedGroup) finalTitle = `Groupe : ${selectedGroup}`;
+        if (evaluationType === "group_sum" && selectedGroup) finalTitle = `Somme Groupe : ${selectedGroup}`;
 
-        if (!finalLabel.trim()) return;
+        if (!finalTitle.trim()) return;
 
         try {
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
-                const newObj = await addObjectiveCustom(user.id, finalLabel, targetNum, newOperator);
+                const newObj = await addObjectiveCustom(user.id, finalTitle, targetNum, newOperator);
                 if (newObj) {
                     setObjectives(prev => [...prev, newObj]);
                     resetForm();
