@@ -6,32 +6,27 @@ interface ProcessReferralParams {
     referredId: string; 
 }
 
-
 export const processReferralReward = async ({ referrerId, referredId }: ProcessReferralParams) => {
     try {
-       
         const { data: existingReferral } = await supabase
             .from("referrals")
             .select("id")
             .eq("referred_id", referredId)
-            .single();
+            .maybeSingle();
 
         if (existingReferral) {
             return { success: false, message: "Parrainage déjà pris en compte." };
         }
 
-       
         const { error: referralError } = await supabase
             .from("referrals")
             .insert({
                 referrer_id: referrerId,
                 referred_id: referredId,
-                status: "completed",
             });
 
         if (referralError) throw referralError;
 
-      
         const { data: referrerProfile } = await supabase
             .from("profiles")
             .select("xp, league_points")
@@ -48,7 +43,6 @@ export const processReferralReward = async ({ referrerId, referredId }: ProcessR
                 .eq("id", referrerId);
         }
 
-       
         await validateActionQuest(referrerId, "refer_friend");
 
         return { success: true, message: "Récompenses attribuées avec succès !" };
@@ -57,7 +51,6 @@ export const processReferralReward = async ({ referrerId, referredId }: ProcessR
         return { success: false, error };
     }
 };
-
 
 export const validateActionQuest = async (
     userId: string,
@@ -73,7 +66,6 @@ export const validateActionQuest = async (
                 await syncStreakObjective(userId);
                 break;
             case "refer_friend":
-               
                 break;
             default:
                 break;

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/Backend/lib/supabase";
 import { generateSecureObjectives } from "@/Backend/services/objectives";
+import { processReferralReward } from "@/Backend/services/referral";
 
 import HeaderComponents from "@/components/RegisterComponents/HeaderComponent";
 import ConnexionInput from "@/components/RegisterComponents/Connexion/ConnexionInput";
@@ -66,6 +67,14 @@ export default function Register() {
     } else {
       if (data?.user) {
         await generateSecureObjectives(data.user.id);
+
+        const cleanReferralCode = referralCode.trim();
+        if (cleanReferralCode && cleanReferralCode !== data.user.id) {
+          await processReferralReward({
+            referrerId: cleanReferralCode,
+            referredId: data.user.id,
+          });
+        }
       }
 
       setMessage("Succès ! Inscription réussie, redirection...");
